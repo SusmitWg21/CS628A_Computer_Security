@@ -1,0 +1,9 @@
+In this problem , first we need to create a file named "password". This is done using command-1.It opens this file and then close.The main thing happen when it take xor of our given output(in hex form) and hex value "abbebabe". Then it compare with value "deadbeef". So we need to give input decimal value of  abbebabe xor deadbeef = 1964180561.
+FLAG IS :flag{43ab7dc17d4aeedfce3bcc4b84d2e22d}
+
+Command-1 touch password.txt
+ How many bytes you want to read from file
+ Input-1: 10
+ Reading 10 bytes
+ You will be banned if you bruteforce... 
+ Input-2: 1964180561

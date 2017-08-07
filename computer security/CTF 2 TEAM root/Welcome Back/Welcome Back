@@ -1,0 +1,3 @@
+Exploited Return orinented-GoT accorading to the provided paper link. responses is closest to global object table so it is used to overwrite GoT address. objdump -D welcom_back showed address of responses as "0601be0" so we overwrite address of GoT as "0601be0"-hexa(128x20). name is given 79 length string on giving 80 length string it is getting overflowed same is the case with responses.
+"printf" address in GoT is overwritten with address of "system" and %s argument of printf is given to system as a binary file in the ccurrent directory. so now whenever printf is called from welcome_back it invokes system call and prints flag.txt.
+-----------------got flag as flag{2d27fc865727950b1425e85a33aeeb4d}----------------------------------------

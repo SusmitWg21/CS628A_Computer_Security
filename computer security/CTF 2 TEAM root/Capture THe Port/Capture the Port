@@ -1,0 +1,68 @@
+http://hexstr-morgan.blogspot.in/2012/10/csaw-2012-net300-writeup.html
+Follow the methods given on ablve site and one can find the solution simply. Some of the obvervations that are crucial are:
+
+ Looking closer, frames that list '3.10.1' as their source and 'host' as the destination have a length of 72 bytes (versus 64 bytes for communication going the other way) - an extra 8 bytes worth of data seems like a good number.
+
+filter: "((usb.transfer_type == 0x01) && (frame.len == 72)) && !(usb.capdata == 00:00:00:00:00:00:00:00)"
+
+Right-click the 'Leftover Capture Data' field (this is our 8 bytes of data, the description basically means that Wireshark doesn't know how to interpret the data and thus doesn't know what to call it) and 'Apply as Column' so we can get an overview of the range of values.
+
+The leftover captured data look like this after interpreting 
+
+0x06-c
+0x16-s
+0x23-6
+0x1F-2
+0x25-8
+0x04-a
+0x00-
+0x2F-{
+0x00-
+0x17-T
+0x00-
+0x04-a
+0x0E-k
+0x08-e
+0x00-
+0x2D-_
+0x00-
+0x1C-y
+0x27-0
+0x00-
+0x18-U
+0x00-
+0x15-r
+0x00-
+0x2D-_
+0x06-c
+0x04-a
+0x11-n
+0x07-d
+0x1C-y
+0x00-
+0x2D-_
+0x00-
+0x07-D
+0x27-0
+0x11-n
+0x17-t
+0x00-
+0x2D-_
+0x00-
+0x0C-i
+0x11-n
+0x17-t
+0x08-e
+0x15-r
+0x15-r
+0x18-u
+0x13-p
+0x17-t
+0x00-
+0x2D-_
+0x00-
+0x10-m
+0x20-3
+0x00_
+0x30 }
+

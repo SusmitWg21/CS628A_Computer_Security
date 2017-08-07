@@ -1,0 +1,63 @@
+## Place your answers here.
+Answer(exploit-2a.py)
+In this i have exploited vulnerablity #1.I have tried to overflow buffer buf[4096] that will overwrite the return address.
+Answer(exploit-2b.py)
+In this i have tried t exploit vulnerablity #2. I tried to overflow buffer pn[1024]. It will overwrite the function pointer handler.
+Answer(exploit-3.py)
+Yes, we can also exploit the vulnerablity written in bugs.txt. In 3rd exercise we overflow a buffer on stack so that return address points to shellcode.
+
+ANSWER: Exercise-4
+------------------------------------------------------------------------------------------------------------------------------------------------
+Answer(exploit-4a.py)
+In this exploit I have modified the "req" string so that the unlink "grades.txt" file. The following diagram explain the working of the exploit
+| 		|
+|		|	High
+|_______________|
+|		|
+|		|
+|_______________|<------string "/home/httpd/grades.txt" address == $ebp+12		
+| Dummy Space	|		(0xbfffddae(address of buf[4076]))
+|filled with'A's|
+|  4Bytes	|
+|_______________|
+|		|<------Unlink Function's address == $ebp+4
+|_______________|		(0x40102450)
+|Dummy space 	|
+|filled with'A's|
+|  12Bytes	|
+|_______________|
+|   envp	|
+|_______________|
+|   sp2         | 
+|_______________|
+|   sp1		|
+|_______________|
+|		|<------buf[4096]
+|_______________|	
+| 		|
+|		|
+| 		|
+|	.	|
+| 	.	|
+|_______________|<------buf[4076] (string is sored here)
+|	.	|
+| 	.	|	Low
+|	.	|
+In above shown stack string "/home/http/grades.txt" is storeed in buffer it would as been sotred at location $ebp+12 instead (it is done it exploit-4b.py). This is a tough exploit to explain and design because of various function call and coping/editing from/to buf[4096] happening in the same function[http.c:http_request_line].
+
+After the execution of function "http_request_line" it should return to its callie function "process_client" (zookd.c) but as you can see that i have overwritten the return address by address of unlink function which takes the argument from address specified by $ebp+12. 
+
+
+Answer(exploit-4b.py)
+This exploit is about buffer pn[1024] of function "http_serve"(http.c).In this exploit i have overwritten the content of function pointer "handler" by address of "Unlink function" and string "/home/httpd/grades/txt" is stored at address $ebp+12. Using above stack one can easily picturize the stack-frame for this exploit. In place of buffer 'buf' buffer 'pn' is present and immediately after it the function pointer 'handler'.
+
+
+All the bugs defined in file bugs.txt can be exploited in the same way as shown above. For example bug#3 is a buffer (http.c:http_serve_file:buf[4096]) can be exploited in such a way. It is because by overflowing this buffer, we can overwrite the two other variable as well as return address,even if they are assigned value later in the program it still can transfer flow to desired value. The 4th vulnerablity can be exploited in the same way as exploit-2a.py. It is working very much same as 'buf' of http_request_line except it is working with request header.Also buffer env[4096](vulnerablity #5) can be exploited in same manner. In short if one uses buffer in a function which return to its callee is very much vulnerable.
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+Answer-5
+
+There are some other vulnerablities in zoobar's web server. Like firstly if we try tp send Null request to server it stops responding and wait for reply indefinately. It may be stucking in infinite loop ([http.c:73]). Also if we use proper request we can watch the code of entire server. for example if i type "http://192.168.56.101:8080/http.c" in my browser it show the whole code of file http.c. And this vulnerablity can be disasterous
+
+
+

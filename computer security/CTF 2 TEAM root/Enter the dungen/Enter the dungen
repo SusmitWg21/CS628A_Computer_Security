@@ -1,0 +1,4 @@
+1.1.1.1 IP address is spoofed. Because this was the only trusted IP address to which the server was responding.
+Earlier we tried different IP addresses in destination ip but nothing was working so we came to know that 1.1.1.1 was the only trusted IP.
+And only way to make server believe that we are 1.1.1.1 was through IP spoofing. And then we used destination IP as our own IP address inside UDP client. ANd then we recieved the flag as 
+-----------------got flag as cs628a{Sp0ofing_a1nT_bAd_s0metim3s}----------------------------------------

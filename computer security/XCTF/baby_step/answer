@@ -1,0 +1,4 @@
+Answer for flag 0
+---------------------------------------------------------------------------
+This is a very simple problem.There is no flag.txt file in folder which mean that flag is present in binary file itself. One can try out by brute-force and print values at memory locations. I got the flag at address specified in line main+159.
+FLAG0 IS : falg{3c00834be8f1169a124ca814ffb9b9e2}

@@ -1,0 +1,8 @@
+5 rules handled as follows:
+(1) admin=0 changed to admin=1 in cookies to get admin acess
+(2) created user-agent CS628A in mozilla and switched to it. This made us pretend using CS628A as browser.
+(3) for adding Do-Not-Track, changed settings in mozilla preference->privacy->checked("DO_NOT_TRACK")
+(4) added referer: securitymooc.in to pretend being origin as securitymooc.in
+(5) for superCookie added "X-UIDH: supercookie" in request header
+----------Got flag as flag{558b97e1945df0646a3000e115b87578}"-----------------------------
+

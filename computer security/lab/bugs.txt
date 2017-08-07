@@ -1,0 +1,78 @@
+#
+# [file:#lines]
+# desc
+#
+
+
+description goes here. for example, the 'buf' variable can be
+overwritten by the 'msg' variable because ...
+
+    <paste offending line(s) of code here>
+
+Vulnerablity #1
+[http.c:65]
+Buffer buf[4096] is being passed as an argument to function http_read_line as
+
+ 		if(http_read_line(fd,buf)<0)
+
+Now http_read_line function updates the value of buf without checking for its size. Due to this it is a vulnerablity and can be exploited. It is exploited in exploit-2a.py . We can use caneries to overcome this vulnerablity.
+
+
+Vulnerablity #2
+[http.c:274]
+ The buffer pn[1024] is another vulnerablity in this application. The main() of file zookfs.c calls the http_serve function if file http.c as
+
+		http_serve(sockfd,getenv("REQUEST_URI"));
+
+This call passes the value of 'REQUEST_URI' to pointer name in http.c. In this function value of name is cpoied to local buffer 'pn' as
+		
+		strcat(pn,name);
+
+Now this can overflow the buffer pn if length of 'REQUEST_URI' is > 1024. THe value of 'REQUEST_URI' is set in function http_request_line as
+
+		envp+=(envp,"REQUEST_URI=%s",reqpath)+1; 
+
+and size of buffer 'reqpath' is greater (2048>1024) that of 'pn' which can overflow pn without overflowing reqpath. Hence it is a vulnerablity.
+It is exploited in exploit-2b.py
+
+Vulnerablity #3
+[http.c:304]
+ The function http_serve_file contain a char buffer of size 1024; buf[1024], whose value is updated by sprintf function as
+
+		sprintf(buf,"%s%s",pn,getenv("PATH_INFO");
+
+Now we write value of pn and PAtH_INFO into buf which can overflow buf because when sizeof(buf)<sizeof(pn)+sizeof(PATH_FLOW). The buffer buf can be overflowed in such a way that buffer pn donot overflow. This is because sprintf donot check for length while coping. Although we can use canaries to avoid overflow.
+
+
+Vulnerablity #4
+[http.c:121]
+This vlunerablity is same as vul#1. But it is available in different function. The buffer buf[4096] can be overflown by executing line 
+		
+		if(http(fd,buf)<0)  
+
+and http_read_line copies the header into this buffer without checking for input length as
+
+		int cc = read(fd, &buf[i], 1);
+
+So we can send a very long header (size>4096) then this buffer will overflow. But this vulnerablity can be overcome using stack canaries.
+
+
+Vulnerablity #5
+[zookd.c:71]
+The function 'process_client' call the function 'http_request_line' as
+
+		if(errmsg=http_request_line(fd,reqpath,sizeof(reqpath),env,&env_len))
+
+and in this function envp is pointing to buffer env. Now conside lines
+
+    envp += sprintf(envp, "REQUEST_METHOD=%s", buf) + 1;(http.c:87)
+    envp += sprintf(envp, "SERVER_PROTOCOL=%s", sp2) + 1;(http.c:88)
+    envp += sprintf(envp, "REQUEST_URI=%s", reqpath) + 1;(http.c:101)
+    envp += sprintf(envp, "SERVER_NAME=zoobar.org") + 1(http.c:102)
+
+Using sprintf it update value of env(envp pointing to env) without checking for length. So this is a vulnerablity that can be exploited without overflowing buffer buf. This vulnerablity can vanish if we use stack canaery or pass path of buffer env(as sizeof(envp)) in function sprintf.
+
+
+
+
+# many more come herena

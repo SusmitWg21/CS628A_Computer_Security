@@ -1,0 +1,11 @@
+In this problem we had to repalce /bin/ls command by /bin/cat so that we can use cat command to print flag from file flag.txt. The main problem was that it only read an input of size 16 byte and also place "\\" before any special charater like >,<,* etc. So first i created a copy of /bin/cat file by command 1).Now i run file by command 2) and give input line 3). Below are the command and flag.
+
+FLAG IS:flag{28570ec98a9600a97a7da3106618334f}
+command/input string
+1) cp /bin/cat smit\\
+2) ./el-ess
+3) ./smit\<flag.txt
+
+Output Command that we got executed:./smit\\\\<flag.txt
+
+

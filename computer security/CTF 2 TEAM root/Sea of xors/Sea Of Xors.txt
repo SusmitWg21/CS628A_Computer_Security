@@ -1,0 +1,71 @@
+We looked for key online for around 2 days but we didn't get an hint about the key. Then i thought maybe the key for encryption in the flag(which start with flag/cs628a). SO i wrote a python code to decrypt the text message(which turned out to be a good hint).
+
+<python Code that worked for our problem>
+
+# # a = "cs628a{bcaaaaffa44dv"
+# a = "cs628a{bcaaaaffa44d"
+# # a= "cs628a{bcaaaaffa44d0d8f3"
+# a= "cs628a{bcaaaaffa44d0d8d"
+# a = "cs628a{bcaaaaffa48d7"
+a = "cs628a{bcaaaaffa48d770f7ca77a}"   #    <--------- answer
+ass = "".join("{:02x}".format(ord(c)) for c in a)
+
+# b = "2b1a16614c141f070d15124d2846070c14560b431757095e0d0617430e041a405718145b034317041318460208525e0d54425c1217131358550d180e5359541802091b13150e06130716094d1802584510125f064141521304051a44414c410f0b0e044f380e13460a5a57131740581f1701045456140e06535f12540e0d0743180e1441070a0d1a6c0c56595b464e0c141907514a"
+b= "2b1a16614c141f070d15124d2846070c14560b431757095e0d0617430e"
+b1 = "041a405718145b034317041318460208525e0d54425c1217131358550d18"
+b3 = "0e5359541802091b13150e06130716094d1802584510125f064141521304"
+b4 = "051a44414c410f0b0e044f380e13460a5a57131740581f1701045456140e"
+b5 = "06535f12540e0d0743180e1441070a0d1a6c0c56595b464e0c141907514a"
+#print len(b)
+# print len(b1)
+binary_a = ass.decode("hex")
+binary_b = b.decode("hex")
+binary_b1 = b1.decode("hex")
+binary_b2 = b3.decode("hex")
+binary_b3 = b4.decode("hex")
+binary_b4 = b5.decode("hex")
+def xor_strings(xs, ys):
+    return "".join(chr(ord(x) ^ ord(y)) for x, y in zip(xs, ys))
+
+xored = xor_strings(binary_a, binary_b).encode("hex")
+ans = ''.join(chr(int(xored[i:i+2], 16)) for i in range(0, len(xored), 2))
+print ans
+
+
+xored = xor_strings(binary_a, binary_b3).encode("hex")
+ans = ''.join(chr(int(xored[i:i+2], 16)) for i in range(0, len(xored), 2))
+print ans
+xored = xor_strings(binary_a, binary_b1).encode("hex")
+ans = ''.join(chr(int(xored[i:i+2], 16)) for i in range(0, len(xored), 2))
+print ans
+
+xored = xor_strings(binary_a, binary_b2).encode("hex")
+ans = ''.join(chr(int(xored[i:i+2], 16)) for i in range(0, len(xored), 2))
+print ans
+
+xored = xor_strings(binary_a, binary_b4).encode("hex")
+ans = ''.join(chr(int(xored[i:i+2], 16)) for i in range(0, len(xored), 2))
+print ans
+
+
+<--python code end-->
+
+We tried for around 50 rounds of brute force method and cracked a part of key (first few values). We were getting output 
+
+Hi Students,I am not
+first time.You know 
+give u a very diffic
+m of cryptography fo
+e i love you all.Tha
+[Finished in 0.0s]
+ 
+using key = cs628a{bcaaaaffa48d7 . Now line number 3 of output give the hint that the text in that line could be something like "give u a very difficult problem". SO we gave key = "give u a very difficult problem", when we get the output
+
+Ls`la?f-cw?Qfcer0b b;}~}tx!b
+bs2$l4/j.r*Jw3"c<1zt54k7qv;4xk
+cs628a{bcaaaaffa48d770f7ca77a} <-------Here is the flag!! :)
+i:/18w)z3cktj'r`+~k;0|fv3.0a
+a:)wt{-fcnkf8'nd|
+e5,72n|fve=/
+[Finished in 0.0s]
+

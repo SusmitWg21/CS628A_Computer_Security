@@ -1,0 +1,7 @@
+## Place your answers here.
+Answer(exploit-2a.py)
+In this i have exploited vulnerablity #1.I have tried to overflow buffer buf[4096] that will overwrite the return address.
+Answer(exploit-2b.py)
+In this i have tried t exploit vulnerablity #2. I tried to overflow buffer pn[1024]. It will overwrite the function pointer handler.
+Answer(exploit-3.py)
+Yes, we can also exploit the vulnerablity written in bugs.txt. In 3rd exercise we overflow a buffer on stack so that return address points to shellcode.

@@ -1,0 +1,7 @@
+
+In this problem we first give a path. Then it Generates a random number using rand() function. Then it compare with the input given by user and if it is true it gives the flag. The random number is extracted using gdb peda.
+
+FLAG IS:flag{211db39986fe749f57d93313219de705}
+path :/home/wglesmi';cat<flag.txt'
+random Number: 1534473119
+

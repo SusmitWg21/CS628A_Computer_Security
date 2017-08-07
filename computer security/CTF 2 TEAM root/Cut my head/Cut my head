@@ -1,0 +1,2 @@
+run command strings(cfJkf2WK.bin). The file cfJkf2WK.bin contain the encryption key by which encrypted.out flie is encrypted. I found this file using internet. 
+site : https://wiremask.eu/tools/xor-cracker/. we got the flag in the result of running that command. 

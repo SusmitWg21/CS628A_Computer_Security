@@ -1,0 +1,6 @@
+exploiting following sequence of code where input string to "buf" is being executed 
+g4 = &v1; g2 = 1; g3 = 255; ((int32_t (*)())buf)();
+System call number for WRITE is 4.
+we transfered eax to ecx and zeroed eax by XOring, and call number 0x4 copied to lower byte of eax i.e. %al and then interrupted with $0x80
+the respective instruction address were given input to the program to execute the write system call.
+--------------------got flag as flag{82cac3645688e0e4a4de2735e195bf37}--------------------------
